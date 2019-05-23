@@ -56,10 +56,6 @@ def rssParser():
                 'description': channelDescription,
                 'link': channelLink
                 #'published': channelPublished
-                #All the info
-                #channel
-                #array of headers
-                    #header0,1,2...
             }
             for entry in entries:
                 payload['entryId'] = entry.id
