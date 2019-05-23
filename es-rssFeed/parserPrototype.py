@@ -64,28 +64,32 @@ def rssParser():
                 'title': 'empty'
                 }
             print(len(entries))
+            n = 0
             for entry in entries:
-                print("iteration check")
+                oneEntry = {}
                 try:
-                    payload['entryId'] = entry.id
+                    oneEntry['entryId'] = entry.id
                 except Exception:
-                    payload['entryId'] = 'no id'
+                    oneEntry['entryId'] = 'no id'
                 try:
-                    payload['entryTitle'] = entry.title
+                    oneEntry['entryTitle'] = entry.title
                 except Exception:
-                    payload['entryTitle'] = 'no entryTitle'
+                    oneEntry['entryTitle'] = 'no entryTitle'
                 try:
-                    payload['entryDescription'] = entry.description
+                    oneEntry['entryDescription'] = entry.description
                 except Exception:
-                    payload['entryDescription'] = 'no entryDescription'
+                    oneEntry['entryDescription'] = 'no entryDescription'
                 try:
-                    payload['entryLink'] = entry.link
+                    oneEntry['entryLink'] = entry.link
                 except Exception:
-                    payload['entryLink'] = 'no entryLink'
+                    oneEntry['entryLink'] = 'no entryLink'
                 try:
-                    payload['entryPublished'] = entry.published
+                    oneEntry['entryPublished'] = entry.published
                 except Exception:
-                    payload['entryPublished'] = 'no entryPublished'
+                    oneEntry['entryPublished'] = 'no entryPublished'
+                payload['entry' + str(n)] = oneEntry
+
+                n = n + 1
 
             print("building response")
             response = requests.request('POST', url, data=json.dumps(payload), headers=headers)
