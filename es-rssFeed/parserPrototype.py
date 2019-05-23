@@ -21,6 +21,7 @@ def rssParser():
     print("url " + url)
     if (url != 0):
         pfeed = feedparser.parse(url)
+        print(pfeed)
 
     #DATA IN CHANNEL
         if 'title' in pfeed.feed:
@@ -51,24 +52,48 @@ def rssParser():
             headers = {
                 'Content-Type': 'application/json'
             }
-            payload = {
-                'title': channelTitle,
-                'description': channelDescription,
-                'link': channelLink
-                #'published': channelPublished
-            }
+            if channelTitle and channelDescription and channelLink != None :
+                payload = {
+                    'title': channelTitle,
+                    'description': channelDescription,
+                    'link': channelLink
+                    #'published': channelPublished
+                }
+            else:
+                payload = {
+                'title': 'empty'
+                }
+            print(len(entries))
             for entry in entries:
-                payload['entryId'] = entry.id
-                payload['entryTitle'] = entry.title
-                payload['entryDescription'] = entry.description
-                payload['entryLink'] = entry.link
-                payload['entryPublished'] = entry.published
+                print("iteration check")
+                try:
+                    payload['entryId'] = entry.id
+                except Exception:
+                    payload['entryId'] = 'no id'
+                try:
+                    payload['entryTitle'] = entry.title
+                except Exception:
+                    payload['entryTitle'] = 'no entryTitle'
+                try:
+                    payload['entryDescription'] = entry.description
+                except Exception:
+                    payload['entryDescription'] = 'no entryDescription'
+                try:
+                    payload['entryLink'] = entry.link
+                except Exception:
+                    payload['entryLink'] = 'no entryLink'
+                try:
+                    payload['entryPublished'] = entry.published
+                except Exception:
+                    payload['entryPublished'] = 'no entryPublished'
 
             print("building response")
             response = requests.request('POST', url, data=json.dumps(payload), headers=headers)
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error(str(e))
+
+        print(payload)
 
         return json.dumps(payload)
     return 202
