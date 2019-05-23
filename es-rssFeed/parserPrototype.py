@@ -52,18 +52,23 @@ def rssParser():
             headers = {
                 'Content-Type': 'application/json'
             }
-            if channelTitle and channelDescription and channelLink != None :
-                payload = {
-                    'title': channelTitle,
-                    'description': channelDescription,
-                    'link': channelLink
-                    #'published': channelPublished
-                }
-            else:
-                payload = {
-                'title': 'empty'
-                }
-            print(len(entries))
+            payload = {}
+            try:
+                payload['title'] = channelTitle
+            except Exception:
+                payload['title'] = 'none'
+            try:
+                payload['description'] = channelDescription
+            except Exception:
+                payload['description'] = 'none'
+            try:
+                payload['link'] = channelLink
+            except:
+                payload['link'] = 'none'
+            try:
+                payload['published'] = channelPublished
+            except:
+                payload['published'] = 'none'
             n = 0
             for entry in entries:
                 oneEntry = {}
