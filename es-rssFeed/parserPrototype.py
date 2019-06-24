@@ -48,6 +48,7 @@ def rssParser():
 
 
         data = None
+        print("DEBUG: start to catch info")
         try:
             headers = {
                 'Content-Type': 'application/json'
@@ -70,6 +71,7 @@ def rssParser():
             except:
                 payload['published'] = 'none'
             n = 0
+            print ("DEBUG: Start to catch subEntries")
             for entry in entries:
                 oneEntry = {}
                 try:
@@ -98,14 +100,16 @@ def rssParser():
 
             print("building response")
             response = requests.request('POST', url, data=json.dumps(payload), headers=headers)
+            print ("RESPONSE SENT")
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error(str(e))
 
         print(payload)
-
+        print("DEBUG End of building")
         return json.dumps(payload)
-    return 202
+    print("RETURNING 404")
+    return 404
 
 
 if __name__=='__main__':
