@@ -1,13 +1,25 @@
 import feedparser
-import requests
 import json
 import logging
 import traceback
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
+history = []
+responses = []
+
+HEADERS = {'Content-Type': 'application/json'}
 
 
 app = Flask(__name__)  # Declaring aplication
+
+@app.route('/rssParser/history', methods=['GET'])
+def rssParserHistory():
+    return jsonify(history)
+
+@app.route('/rssParser/responses', methods=['GET'])
+def rssParserResponses():
+    return jsonify(responses)
+
 
 # port is 8050
 @app.route('/rssParser', methods=['POST'])
@@ -18,6 +30,7 @@ def rssParser():
 
 
     url = request.json.get('url', 0)
+    history.append(url)
     print("url " + url)
     if (url != 0):
         pfeed = feedparser.parse(url)
@@ -50,9 +63,6 @@ def rssParser():
         data = None
         print("DEBUG: start to catch info")
         try:
-            headers = {
-                'Content-Type': 'application/json'
-            }
             payload = {}
             try:
                 payload['title'] = channelTitle
@@ -64,11 +74,11 @@ def rssParser():
                 payload['description'] = 'none'
             try:
                 payload['link'] = channelLink
-            except:
+            except Exception:
                 payload['link'] = 'none'
             try:
                 payload['published'] = channelPublished
-            except:
+            except Exception:
                 payload['published'] = 'none'
             n = 0
             print ("DEBUG: Start to catch subEntries")
@@ -99,7 +109,8 @@ def rssParser():
                 n = n + 1
 
             print("building response")
-            response = requests.request('POST', url, data=json.dumps(payload), headers=headers)
+            responses.append(payload)
+            #response = requests.request('POST', url, data=json.dumps(payload), headers=HEADERS)
             print ("RESPONSE SENT")
         except Exception as e:
             logging.error(traceback.format_exc())
@@ -109,7 +120,7 @@ def rssParser():
         print("DEBUG End of building")
         return json.dumps(payload)
     print("RETURNING 404")
-    return 404
+    return 'not found'
 
 
 if __name__=='__main__':
