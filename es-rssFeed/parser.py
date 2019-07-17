@@ -2,6 +2,7 @@ import feedparser
 import json
 import logging
 import traceback
+from datetime import datetime
 from flask import Flask, request, jsonify
 
 history = []
@@ -31,13 +32,13 @@ def rssParser():
 
     url = request.json.get('url', 0)
     # HERE DATE
-    timestamp = request.json.get('from_time', 0)
+    storedTimestamp = request.json.get('from_time', 0)
 
 
-    print("timestamp in request: {}".format(timestamp))
+    print("timestamp in request: {}".format(storedTimestamp))
     history.append(url)
     print("url " + url)
-    if (url != 0 and timestamp != 0):
+    if (url != 0 and storedTimestamp != 0):
         pfeed = feedparser.parse(url)
         print(pfeed)
 
@@ -52,8 +53,8 @@ def rssParser():
         if 'description' in pfeed.feed:
             channelDescription = pfeed.feed.get('description', 'no description')
             print("Description " + channelDescription)
-        if 'published' in pfeed.feed:
-            channelPublished = pfeed.feed.get('published', 'published')
+        if 'updated' in pfeed.feed:
+            channelPublished = pfeed.feed.get('updated', 'no date')
             print("Published " + channelPublished)
 
         entries = pfeed.entries
@@ -89,32 +90,36 @@ def rssParser():
             n = 0
             print ("DEBUG: Start to catch subEntries")
             for entry in entries:
-                entryTime = entries[0].updated
-                print(entryTime)
-                oneEntry = {}
-                try:
-                    oneEntry['entryId'] = entry.id
-                except Exception:
-                    oneEntry['entryId'] = 'no id'
-                try:
-                    oneEntry['entryTitle'] = entry.title
-                except Exception:
-                    oneEntry['entryTitle'] = 'no entryTitle'
-                try:
-                    oneEntry['entryDescription'] = entry.description
-                except Exception:
-                    oneEntry['entryDescription'] = 'no entryDescription'
-                try:
-                    oneEntry['entryLink'] = entry.link
-                except Exception:
-                    oneEntry['entryLink'] = 'no entryLink'
-                try:
-                    oneEntry['entryPublished'] = entry.updated
-                except Exception:
-                    oneEntry['entryPublished'] = 'no entryDate'
-                payload['entry' + str(n)] = oneEntry
 
-                n = n + 1
+
+                formattedTime = datetime.fromisoformat(entry.updated)
+                updatedStamp = datetime.timestamp(formattedTime)
+
+                if (updatedStamp > storedTimestamp):
+                    oneEntry = {}
+                    try:
+                        oneEntry['entryId'] = entry.id
+                    except Exception:
+                        oneEntry['entryId'] = 'no id'
+                    try:
+                        oneEntry['entryTitle'] = entry.title
+                    except Exception:
+                        oneEntry['entryTitle'] = 'no entryTitle'
+                    try:
+                        oneEntry['entryDescription'] = entry.description
+                    except Exception:
+                        oneEntry['entryDescription'] = 'no entryDescription'
+                    try:
+                        oneEntry['entryLink'] = entry.link
+                    except Exception:
+                        oneEntry['entryLink'] = 'no entryLink'
+                    try:
+                        oneEntry['entryPublished'] = entry.updated
+                    except Exception:
+                        oneEntry['entryPublished'] = 'no entryDate'
+                    payload['entry' + str(n)] = oneEntry
+
+                    n = n + 1
 
             print("building response")
             responses.append(payload)
