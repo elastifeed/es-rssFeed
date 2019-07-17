@@ -2,10 +2,12 @@ import feedparser
 import json
 import logging
 import traceback
-from flask import Flask, request, jsonify
-
+from flask import Flask, request, jsonify, Blueprint
+data = Blueprint("data", __name__, url_prefix="/rssParser")
 history = []
 responses = []
+
+threads = []
 
 HEADERS = {'Content-Type': 'application/json'}
 
@@ -112,6 +114,8 @@ def rssParser():
             responses.append(payload)
             #response = requests.request('POST', url, data=json.dumps(payload), headers=HEADERS)
             print ("RESPONSE SENT")
+            data = json.dumps(payload)
+            return data
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error(str(e))
