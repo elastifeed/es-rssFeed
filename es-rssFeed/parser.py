@@ -12,17 +12,17 @@ HEADERS = {'Content-Type': 'application/json'}
 
 app = Flask(__name__)  # Declaring aplication
 
-@app.route('/rssParser/history', methods=['GET'])
+@app.route('/parse/history', methods=['GET'])
 def rssParserHistory():
     return jsonify(history)
 
-@app.route('/rssParser/responses', methods=['GET'])
+@app.route('/parse/responses', methods=['GET'])
 def rssParserResponses():
     return jsonify(responses)
 
 
 # port is 8050
-@app.route('/rssParser', methods=['POST'])
+@app.route('/parse', methods=['POST'])
 def rssParser():
 
     #Extract URL, DATE, HEADING, FEEDCHANNEL"title"
@@ -30,11 +30,17 @@ def rssParser():
 
 
     url = request.json.get('url', 0)
+    # HERE DATE
+    timestamp = request.json.get('from_time', 0)
+
+
+    print("timestamp in request: {}".format(timestamp))
     history.append(url)
     print("url " + url)
-    if (url != 0):
+    if (url != 0 and timestamp != 0):
         pfeed = feedparser.parse(url)
         print(pfeed)
+
 
     #DATA IN CHANNEL
         if 'title' in pfeed.feed:
@@ -53,9 +59,9 @@ def rssParser():
         entries = pfeed.entries
 
 
-    #HERE DATE
 
     #HERE HEADING
+        #HAHA JOKES, we don't do that over here
 
     #HERE FEEDCHANNEL"title"
 
@@ -83,6 +89,8 @@ def rssParser():
             n = 0
             print ("DEBUG: Start to catch subEntries")
             for entry in entries:
+                entryTime = entries[0].updated
+                print(entryTime)
                 oneEntry = {}
                 try:
                     oneEntry['entryId'] = entry.id
@@ -101,9 +109,9 @@ def rssParser():
                 except Exception:
                     oneEntry['entryLink'] = 'no entryLink'
                 try:
-                    oneEntry['entryPublished'] = entry.published
+                    oneEntry['entryPublished'] = entry.updated
                 except Exception:
-                    oneEntry['entryPublished'] = 'no entryPublished'
+                    oneEntry['entryPublished'] = 'no entryDate'
                 payload['entry' + str(n)] = oneEntry
 
                 n = n + 1
