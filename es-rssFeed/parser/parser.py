@@ -80,9 +80,9 @@ def rssParser():
             except Exception:
                 payload['description'] = 'none'
             try:
-                payload['link'] = channelLink
+                payload['url'] = channelLink
             except Exception:
-                payload['link'] = 'none'
+                payload['url'] = 'none'
             try:
                 payload['published'] = channelPublished
             except Exception:
@@ -110,9 +110,9 @@ def rssParser():
                     except Exception:
                         oneEntry['entryDescription'] = 'no entryDescription'
                     try:
-                        oneEntry['entryLink'] = entry.link
+                        oneEntry['url'] = entry.link
                     except Exception:
-                        oneEntry['entryLink'] = 'no entryLink'
+                        oneEntry['url'] = 'no entryLink'
                     try:
                         oneEntry['entryPublished'] = entry.updated
                     except Exception:
